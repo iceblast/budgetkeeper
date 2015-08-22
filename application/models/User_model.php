@@ -12,7 +12,7 @@ class User_model extends CI_Model {
 					'salt'			=>$salt,
 					'firstname'		=>$this->input->post('firstname'),
 					'lastname'		=>$this->input->post('lastname'),
-					'status'		=>0,
+					'status'		=>1,
 					'date_created'	=>date('Y-m-d H:i:s')
 				);
 
@@ -95,9 +95,9 @@ class User_model extends CI_Model {
 
     public function getUsers(){
     	$query=$this->db->get("users");
-    	$result = $query->result();
+    	$results = $query->result();
 
-    	return $result;
+    	return $results;
     }
 
     public function getUserById($user_id){
