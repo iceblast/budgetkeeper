@@ -32,11 +32,12 @@ class User_model extends CI_Model {
     	$user = $this->getUser($username);
     	if(!is_null($user)){
     		$salt = $user->salt;
-
-    		$this->db->where("$username",$username);
+    		$this->db->group_start();
+    		$this->db->where("username",$username);
     		$this->db->or_where("email",$username);
+    		$this->db->group_end();
 	        $this->db->where("password",sha1($salt . sha1($salt . sha1($password))));
-	            
+
 	        $query=$this->db->get("users");
 
 	        if($query->num_rows()>0)
@@ -52,7 +53,6 @@ class User_model extends CI_Model {
             	
             	$this->session->userdata = $newdata;
 
-            	$this->cart_model->moveSessionToDB($rows->user_id);
                 return true;            
 			}
     	}
@@ -60,8 +60,15 @@ class User_model extends CI_Model {
 		return false;
     }
 
+    public function isLoggedIn(){
+    	if(($this->session->userdata('user_id')!=""))
+		{
+	    	return true;
+	    }
+	    return false;
+    }
     public function getUser($username){
-    	$this->db->where("$username",$username);
+    	$this->db->where("username",$username);
     	$this->db->or_where("email",$username);
     	$query=$this->db->get("users");
     	$row = $query->row();
@@ -100,3 +107,4 @@ class User_model extends CI_Model {
 
     	return $row;
     }
+}
