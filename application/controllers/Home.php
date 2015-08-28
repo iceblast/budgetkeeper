@@ -25,6 +25,9 @@ class Home extends CI_Controller {
 			
 			$data['categories']=$this->category_model->getCategoriesByUserId($user_id);
 			$data['entry_types']=$this->entry_model->getEntryTypes();
+
+			add_header_js('highcharts.js');
+			add_header_js('home.js');
 			$this->load->view('common/header',$data);
 			$this->load->view("home/index", $data);
 			$this->load->view('common/footer',$data);	

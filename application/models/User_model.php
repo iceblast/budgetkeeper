@@ -107,4 +107,12 @@ class User_model extends CI_Model {
 
     	return $row;
     }
+
+    public function getUserAccounts($user_id){
+        $this->db->where("user_id",$user_id);
+        $query=$this->db->get("users_accounts");
+        $results = $query->result();
+
+        return $results;
+    }
 }

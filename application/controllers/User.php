@@ -11,40 +11,38 @@ class User extends CI_Controller {
 
 	public function register()
 	{
-		$data = array();
 		if($this->user_model->isLoggedIn())
 		{
 			redirect('/', 'refresh');
 		}
 		else{
-			$this->load->view('common/header',$data);
-			$this->load->view("user/register", $data);
-			$this->load->view('common/footer',$data);
-		}
-	}
-	public function submit(){
+			if($this->input->post()){
+				$this->load->library('form_validation');
 
-		$this->load->library('form_validation');
-		// field name, error message, validation rules
-		// $this->form_validation->set_rules('user_name', 'User Name', 'trim|required|min_length[4]|xss_clean');
-		$this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email');
-		$this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[4]|max_length[32]');
-		$this->form_validation->set_rules('con_password', 'Password Confirmation', 'trim|required|matches[password]');
+				$this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email');
+				$this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[4]|max_length[32]');
+				$this->form_validation->set_rules('con_password', 'Password Confirmation', 'trim|required|matches[password]');
 
-		if($this->form_validation->run() == FALSE)
-		{
-			$this->register();
-		}
-		else
-		{
-			$this->user_model->add();
-			$this->success();
+				if($this->form_validation->run() == FALSE)
+				{
+					$this->load->view('common/header');
+					$this->load->view('user/register');
+					$this->load->view('common/footer');
+				}
+				else
+				{
+					$this->user_model->add();
+					$this->success();
+				}      
+			}
+			else{
+				$this->load->view('common/header');
+				$this->load->view('user/register');
+				$this->load->view('common/footer');
+			}	
 		}
 	}
 	
-	public function home(){
-		redirect('/', 'refresh');
-	}
 	public function login()
 	{
 		if($this->user_model->isLoggedIn())
@@ -74,7 +72,7 @@ class User extends CI_Controller {
 	}
 
 	public function success(){
-		//$this->load->view('welcome_message');
+
 		redirect('/', 'refresh');
 	}
 
