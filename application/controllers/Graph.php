@@ -15,9 +15,13 @@ class Graph extends CI_Controller {
 	}
 	
 	public function dailyExpenses(){
+		
+	}
+	public function hourlyExpenses(){
 		$results=array();
-		$date=date('Y-m-d',strtotime("-1 days"));
-		$expenses = $this->entry_model->getExpensesByDate($date);
+		//$date=date('Y-m-d',strtotime("-1 days"));
+		$date=date('Y-m-d');
+		$expenses = $this->entry_model->getHourlyExpenses($date);
 		$times = generate_time();
 		$hasMatch=false;
 		$maxtime='0';
@@ -43,26 +47,13 @@ class Graph extends CI_Controller {
 			if(strtotime($time)>$maxtime){
 				break;
 			}
-			// if($hasMatch!=true){
-			// 	if(count($results)>0){
-			// 		$results[]=array(
-			// 					'date'	=>$time,
-			// 					'amount'=>null,
-			// 					'rt'	=>null
-			// 					);
-			// 		$data[]=null;
-						
-			// 	}
-			// }
-			// $hasMatch=false;	
-
 		}
 
 		$series = array(); 
 		$series[] = array('name'=>'Total','data'=>$data);
-		//$series[] = array('name'=>'amount','data'=>results_toSingleArray($results,'amount'));
+
 		$graph_data = array('categories'=>results_toSingleArray($results,'date'), 'series'=>$series);
 		echo json_encode($graph_data);
-		//echo json_results($results,'rt');
+
 	}
 }

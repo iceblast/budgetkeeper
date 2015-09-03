@@ -47,7 +47,7 @@ class User extends CI_Controller {
 	{
 		if($this->user_model->isLoggedIn())
 		{
-			redirect('/', 'refresh');
+			redirect('/');
 		}
 		else{
 			if($this->input->post()){
@@ -72,8 +72,7 @@ class User extends CI_Controller {
 	}
 
 	public function success(){
-
-		redirect('/', 'refresh');
+		redirect('/');
 	}
 
 	public function logout()

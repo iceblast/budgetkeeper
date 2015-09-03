@@ -5,7 +5,7 @@ if(!function_exists('json_results')){
 	function json_results($results,$field)
 	{
 		$json = array();
-		if(!is_array($results)){
+		if(!is_array($results[0])){
 			foreach($results as $result){
 				$json[] = $result->$field;
 			}

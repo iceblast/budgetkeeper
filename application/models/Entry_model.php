@@ -39,7 +39,7 @@ class Entry_model extends CI_Model {
 		return $results;
 	}
 
-	public function getSummarizedEntries($entry_type=NULL, $datefrom=NULL, $dateto=NULL,$account=NULL){
+	public function getHourlyEntries($entry_type=NULL, $datefrom=NULL, $dateto=NULL,$account=NULL){
 		//halfhour
 		//$this->db->select('SUM(amount) amount,entry_type,SEC_TO_TIME(FLOOR((TIME_TO_SEC(date))/1800)*1800) date,account');
 		
@@ -87,7 +87,7 @@ class Entry_model extends CI_Model {
 	}
 
 	public function getDescSuggest($account=NULL){
-		$this->db->select('description');
+		$this->db->select('DISTINCT description',false);
 		if(isset($account)) $this->db->where('account',$account);
 		$this->db->where('user_id',$this->session->userdata['user_id']);
 		$query=$this->db->get("entries");
@@ -96,7 +96,7 @@ class Entry_model extends CI_Model {
 		return $results;
 	}
 
-	public function getExpensesByDate($date=NULL,$account=NULL){
+	public function getHourlyExpenses($date=NULL,$account=NULL){
 		if(!isset($date)){
 			$date=date('Y-m-d');
 		} 
@@ -107,6 +107,6 @@ class Entry_model extends CI_Model {
 		
 		$datefrom = $date.' 00:00:00';
 		$dateto = $date.' 23:59:59';
-		return $this->getSummarizedEntries('2',$datefrom,$dateto,$account);
+		return $this->getHourlyEntries('2',$datefrom,$dateto,$account);
 	}
 }

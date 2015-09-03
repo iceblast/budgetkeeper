@@ -9,8 +9,8 @@ class Entry extends CI_Controller {
 		$this->load->model('user_model');
 
 		if(!$this->user_model->isLoggedIn())
-		{
-			redirect('/user/login', 'refresh');
+		{	
+			redirect('/user/login');
 		}
 	}
 

@@ -14,10 +14,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 		</select>
 	</p>
 	<p>
-		<input type="text" id="description" name="description" value="<?php echo set_value('description'); ?>" placeholder="Description" />
+		<input type="text" id="description" name="description" value="<?php //echo set_value('description'); ?>" placeholder="Description" />
 	</p>
 	<p>
-		<input type="number" id="amount" name="amount" value="<?php echo set_value('amount'); ?>" placeholder="Amount" />
+		<input type="number" id="amount" name="amount" value="<?php //echo set_value('amount'); ?>" placeholder="Amount" />
 	</p>
 	<p>
 		<select name="entry_type" id="entry_type" class="">

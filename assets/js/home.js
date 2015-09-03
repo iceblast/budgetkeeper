@@ -7,7 +7,7 @@ var options = 	{
 			      		enabled: false
 				  	},
 			        title: {
-			            text: 'Monthly Average Temperature',
+			            text: 'Daily Expenses',
 			            x: -20 //center
 			        },
 			        plotOptions:{
@@ -28,10 +28,10 @@ var options = 	{
 			        		}
 			        	}
 			        },
-			        subtitle: {
-			            text: 'Source: WorldClimate.com',
-			            x: -20
-			        },
+			        // subtitle: {
+			        //     text: 'Source: WorldClimate.com',
+			        //     x: -20
+			        // },
 			        xAxis: {
 			            categories: [{}]
 			        },
@@ -62,7 +62,7 @@ var options = 	{
 var chart;
 var get_graph = function(){
 	$.ajax({
-		url: "graph/dailyexpenses",
+		url: "graph/hourlyexpenses",
 		type:'post',
 		dataType: "json",
 		success: function(data){
