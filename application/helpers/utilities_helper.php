@@ -39,7 +39,6 @@ if(!function_exists('results_toSingleArray')){
 			
 		}
 		
-
 		return $array;
 	}
 }
@@ -80,5 +79,24 @@ if(!function_exists('generate_time'))
 		}
 
 		return $time;
+	}   
+}
+
+if(!function_exists('generate_days'))
+{
+	function generate_days($begin=NULL,$end=NULL)
+	{
+		$days =array();
+
+		$begin 		= is_null($begin)?(new DateTime())->modify('first day of this month'):new DateTime($begin);
+		$end 		= is_null($end)?(new DateTime())->modify('last day of this month'):new DateTime($end);
+		$end 		= $end->modify( '+1 day' );
+		$interval 	= new DateInterval('P1D');
+		$daterange 	= new DatePeriod($begin, $interval ,$end);
+
+		foreach($daterange as $date){
+			$days[] = $date;
+		}
+		return $days;
 	}   
 }

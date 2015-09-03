@@ -31,16 +31,18 @@ class Entry extends CI_Controller {
 			$data['categories']=$this->category_model->getCategoriesByUserId($user_id);
 			$data['entry_types']=$this->entry_model->getEntryTypes();
 			$data['date']= date('Y-m-d')." $hour:$minute";
+
 			add_header_js('typeahead.bundle.min.js');
 			add_header_js('jquery.datetimepicker.js');
 			add_header_css('jquery.datetimepicker.css');
+
 			$this->load->view('common/header',$data);
 			$this->load->view("entry/index", $data);
 			$this->load->view('common/footer',$data);	
 	}
 
 	public function suggestDesc(){
-		$results = $this->entry_model->getDescSuggest();
+		$results = $this->entry_model->getSuggestDesc();
 		echo json_results($results,'description');
 	}
 }

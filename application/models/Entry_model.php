@@ -39,6 +39,30 @@ class Entry_model extends CI_Model {
 		return $results;
 	}
 
+	public function getEntriesByDescription($entry_type=NULL, $datefrom=NULL, $dateto=NULL,$account=NULL){
+		$this->db->select('description,entry_type,sum(amount) amount,date,account');
+		if(isset($entry_type)) $this->db->where('entry_type',$entry_type);
+		if(isset($account)) $this->db->where('account',$account);
+		if(isset($datefrom)&&isset($dateto)){
+			$this->db->where('date >=',$datefrom);
+			$this->db->where('date <=',$dateto);
+		} 
+		elseif(isset($datefrom)){
+			$this->db->where('date >=',$datefrom);
+		}
+		elseif(isset($dateto)){
+			$this->db->where('date <=',$dateto);
+		}
+		$this->db->where('user_id',$this->session->userdata['user_id']);
+		$this->db->group_by('description');
+		$this->db->order_by('date','ASC');
+		//var_dump($this->db->get_compiled_select("entries"));die();
+		$query=$this->db->get("entries");
+		$results = $query->result();
+
+		return $results;
+	}
+
 	public function getHourlyEntries($entry_type=NULL, $datefrom=NULL, $dateto=NULL,$account=NULL){
 		//halfhour
 		//$this->db->select('SUM(amount) amount,entry_type,SEC_TO_TIME(FLOOR((TIME_TO_SEC(date))/1800)*1800) date,account');
@@ -86,10 +110,23 @@ class Entry_model extends CI_Model {
     	return $results;
 	}
 
-	public function getDescSuggest($account=NULL){
+	public function getSuggestDesc($entry_type=NULL,$datefrom=NULL,$dateto=NULL,$account=NULL){
 		$this->db->select('DISTINCT description',false);
+		
+		if(isset($datefrom)&&isset($dateto)){
+			$this->db->where('date >=',$datefrom);
+			$this->db->where('date <=',$dateto);
+		} 
+		elseif(isset($datefrom)){
+			$this->db->where('date >=',$datefrom);
+		}
+		elseif(isset($dateto)){
+			$this->db->where('date <=',$dateto);
+		}
+		if(isset($entry_type)) $this->db->where('entry_type',$entry_type);
 		if(isset($account)) $this->db->where('account',$account);
 		$this->db->where('user_id',$this->session->userdata['user_id']);
+		//var_dump($this->db->get_compiled_select("entries"));die();
 		$query=$this->db->get("entries");
 		$results = $query->result();
 
@@ -108,5 +145,18 @@ class Entry_model extends CI_Model {
 		$datefrom = $date.' 00:00:00';
 		$dateto = $date.' 23:59:59';
 		return $this->getHourlyEntries('2',$datefrom,$dateto,$account);
+	}
+
+	public function getDailyExpenses($from=NULL,$to=NULL,$account=NULL){
+		if(is_null($from)){
+			$from = (new DateTime())->modify('first day of this month');
+			$from = $from->format('Y-m-d');
+		} 
+		if(is_null($to)){
+			$to = (new DateTime())->modify('last day of this month');
+			$to = $to->modify( '+1 day' );
+			$to = $to->format('Y-m-d');
+		} 
+		return getEntries('2', $from, $to,$account);
 	}
 }
