@@ -7,15 +7,16 @@ var options = {
                         enabled: false
                     },
         title: {
-            text: 'Stacked column chart'
+            text: 'Daily Expenses'
         },
-        xAxis: {
-            categories: []
-        },
+        // xAxis: {
+        //     categories: []
+        // },
+        xAxis:[],
         yAxis: {
             min: 0,
             title: {
-                text: 'Total Expenses'
+                text: 'Amount'
             },
             stackLabels: {
                 enabled: true,
@@ -27,9 +28,9 @@ var options = {
         },
         legend: {
             align: 'right',
-            x: -30,
+            x: 0,
             verticalAlign: 'top',
-            y: 25,
+            y: 0,
             floating: true,
             backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
             borderColor: '#CCC',
@@ -37,17 +38,21 @@ var options = {
             shadow: false
         },
         tooltip: {
-            formatter: function () {
-                return '<b>' + this.x + '</b><br/>' +
-                    this.series.name + ': ' + this.y + '<br/>' +
-                    'Total: ' + this.point.stackTotal;
-            }
+            // formatter: function () {
+            //     return '<b>' + this.x + '</b><br/>' +
+            //         this.series.name + ': ' + this.y + '<br/>' +
+            //         'Total: ' + this.point.stackTotal;
+            // }
+            shared:true
         },
         plotOptions: {
             column: {
+                // pointPadding: 0,
+                // borderWidth: 0,
+                //pointWidth:50,
                 stacking: 'normal',
                 dataLabels: {
-                    enabled: true,
+                    enabled: false,
                     color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
                     style: {
                         textShadow: '0 0 3px black'
@@ -59,28 +64,52 @@ var options = {
     };
 
 var chart;
-var get_graph = function(){
+var get_graph1 = function(){
     $.ajax({
-        url: "graph/dailyexpenses",
+        //url: "graph/dailyexpenses",
+        url: "graph/dailysummary",
         type:'post',
         dataType: "json",
         success: function(data){
-            options.series=[];
-
-            $.each(data.series, function(index, element) {
-                var seriesOptions = {
-                            name: element.name,
-                            data: element.data
-                        };
-
-                        options.series.push(seriesOptions);
-            });
-            options.xAxis.categories = data.categories;
-            chart = new Highcharts.Chart(options);      
+            options.series= data.series;
+            options.chart.renderTo = 'container';
+            options.xAxis.push({categories:data.categories});
+            //alert(data.weekdays);
+            options.xAxis.push({opposite:true,categories:data.weekdays});
+            chart = new Highcharts.Chart(options,function(chart) {
+                var extremes = chart.xAxis[0].getExtremes();
+                chart.xAxis[1].setExtremes(extremes.min-0.5,extremes.max+0.5);
+                });      
         }
     });
 }
+
 $(document).ready(function() { 
-        get_graph();
+        get_graph1();
+        //get_graph2();
+
+        $('.chartbutton').click(function(){
+            var url='/graph/'+$(this).data('url');
+            $.ajax({
+                //url: "graph/dailyexpenses",
+                url: url,
+                type:'post',
+                dataType: "json",
+                success: function(data){
+                    while(chart.series.length > 0){
+                        chart.series[0].remove(true);
+                    }
+                    chart.colorCounter = 0;
+                    chart.symbolCounter = 0;
+                    
+                    $.each(data.series, function(index, element) {
+                        chart.addSeries(element,false);              
+                    });
+                    chart.xAxis[0].setCategories(data.categories);
+                    //chart.redraw();     
+                }
+            });
+                
+        });
         
 });

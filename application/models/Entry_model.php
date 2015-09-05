@@ -39,6 +39,60 @@ class Entry_model extends CI_Model {
 		return $results;
 	}
 
+	public function getDailyBalance($datefrom=NULL, $dateto=NULL,$account=NULL){
+		
+		//(@runtot := @runtot + a.amount) AS rt
+		$this->db->select('date_format(date, \'%Y-%m-%d\') date,sum(if(entry_type=2, amount, 0)) total_expenses,sum(if(entry_type=1, amount, 0)) total_income',false);
+		if(isset($account)) $this->db->where('account',$account);
+		if(isset($datefrom)&&isset($dateto)){
+			$this->db->where('date >=',$datefrom);
+			$this->db->where('date <=',$dateto);
+		} 
+		elseif(isset($datefrom)){
+			$this->db->where('date >=',$datefrom);
+		}
+		elseif(isset($dateto)){
+			$this->db->where('date <=',$dateto);
+		}
+		$this->db->where('user_id',$this->session->userdata['user_id']);
+		//$this->db->group_by('type');
+		$this->db->group_by('date_format(date,\'%Y-%m-%d\')');
+		$this->db->order_by('date','ASC');
+		//var_dump($this->db->get_compiled_select("entries"));die();
+
+		$subquery=$this->db->get_compiled_select("entries");
+		$this->db->simple_query('SET @runbal:=0');
+		$this->db->simple_query('SET @runex:=0');
+		$query = $this->db->query('select *,@runbal:=@runbal+total_income-total_expenses balance,@runex:=@runex+total_expenses runex from ('.$subquery.') a');
+
+		$results = $query->result();
+
+		return $results;
+	}
+	public function getDailyEntries($entry_type=NULL, $datefrom=NULL, $dateto=NULL,$account=NULL){
+		$this->db->select('entry_type,sum(amount) amount,date_format(date,\'%Y-%m-%d\'),account');
+		if(isset($entry_type)) $this->db->where('entry_type',$entry_type);
+		if(isset($account)) $this->db->where('account',$account);
+		if(isset($datefrom)&&isset($dateto)){
+			$this->db->where('date >=',$datefrom);
+			$this->db->where('date <=',$dateto);
+		} 
+		elseif(isset($datefrom)){
+			$this->db->where('date >=',$datefrom);
+		}
+		elseif(isset($dateto)){
+			$this->db->where('date <=',$dateto);
+		}
+		$this->db->where('user_id',$this->session->userdata['user_id']);
+		$this->db->group_by('date_format(date,\'%Y-%m-%d\')');
+		$this->db->order_by('date','ASC');
+		//var_dump($this->db->get_compiled_select("entries"));die();
+		$query=$this->db->get("entries");
+		$results = $query->result();
+
+		return $results;
+	}
+
 	public function getEntriesByDescription($entry_type=NULL, $datefrom=NULL, $dateto=NULL,$account=NULL){
 		$this->db->select('description,entry_type,sum(amount) amount,date,account');
 		if(isset($entry_type)) $this->db->where('entry_type',$entry_type);
@@ -145,18 +199,5 @@ class Entry_model extends CI_Model {
 		$datefrom = $date.' 00:00:00';
 		$dateto = $date.' 23:59:59';
 		return $this->getHourlyEntries('2',$datefrom,$dateto,$account);
-	}
-
-	public function getDailyExpenses($from=NULL,$to=NULL,$account=NULL){
-		if(is_null($from)){
-			$from = (new DateTime())->modify('first day of this month');
-			$from = $from->format('Y-m-d');
-		} 
-		if(is_null($to)){
-			$to = (new DateTime())->modify('last day of this month');
-			$to = $to->modify( '+1 day' );
-			$to = $to->format('Y-m-d');
-		} 
-		return getEntries('2', $from, $to,$account);
 	}
 }
